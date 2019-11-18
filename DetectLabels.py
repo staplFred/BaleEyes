@@ -14,9 +14,9 @@ def detectLabels(img):
 
     imgGrayscaleScene, imgThreshScene = Preprocess.preprocess(img)         # preprocess to get grayscale and threshold images
 
-    if Main.showSteps == True: # show steps #######################################################
-        cv2.imshow("GrayScale", imgGrayscaleScene)
-        cv2.imshow("Thresh", imgThreshScene)
+    # if Main.showSteps == True: # show steps #######################################################
+    #     cv2.imshow("GrayScale", imgGrayscaleScene)
+    #     cv2.imshow("Thresh", imgThreshScene)
 
     listOfPossibleCharsInScene = findPossibleCharsInScene(imgThreshScene, img)
 
@@ -77,15 +77,20 @@ def findPossibleCharsInScene(imgThresh, imgContours):
 
     for i in range(0, len(contours)):                       # for each contour
 
-        if Main.showSteps == True: # show steps ###################################################
-            cv2.drawContours(imgContours, contours, i, Main.SCALAR_RED)
-        # end if # show steps #####################################################################
+        # if Main.showSteps == True: # show steps ###################################################
+        #     cv2.drawContours(imgContours, contours, i, Main.SCALAR_RED)
+        # # end if # show steps #####################################################################
 
         possibleChar = PossibleChar.PossibleChar(contours[i])
 
         if DetectChars.checkIfPossibleChar(possibleChar):                   # if contour is a possible char, note this does not compare to other chars (yet) . . .
             intCountOfPossibleChars = intCountOfPossibleChars + 1           # increment count of possible chars
             listOfPossibleChars.append(possibleChar)                        # and add to list of possible chars
+            x1 = possibleChar.intBoundingRectX
+            y1 = possibleChar.intBoundingRectY
+            x2 = possibleChar.intBoundingRectX + possibleChar.intBoundingRectWidth
+            y2 = possibleChar.intBoundingRectY + possibleChar.intBoundingRectHeight
+            # cv2.rectangle(imgContours, (x1,y1), (x2,y2), Main.SCALAR_GREEN)
         # end if
     # end for
 

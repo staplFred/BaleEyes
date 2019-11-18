@@ -22,8 +22,8 @@ def main():
         return                                              # and exit program
     # end if
 
-    if showSteps == True: # show steps #######################################################
-        cv2.imshow("Original", imgOriginal)
+    # if showSteps == True: # show steps #######################################################
+    #     cv2.imshow("Original", imgOriginal)
 
     listOfPossibleLabels = DetectLabels.detectLabels(imgOriginal)           # detect plates
 
