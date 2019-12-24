@@ -14,7 +14,7 @@ import PossibleChar
 
 kNearest = cv2.ml.KNearest_create()
 
-        # constants for checkIfPossibleChar, this checks one possible char only (does not compare to another char)
+# constants for checkIfPossibleChar, this checks one possible char only (does not compare to another char)
 MIN_PIXEL_WIDTH = 2
 MIN_PIXEL_HEIGHT = 8
 
@@ -76,43 +76,43 @@ def loadKNNDataAndTrainKNN():
 # end function
 
 ###################################################################################################
-def detectCharsInPlates(listOfPossiblePlates):
+def detectCharsInPlates(listOfPossibleLabels):
     intPlateCounter = 0
     imgContours = None
     contours = []
 
-    if len(listOfPossiblePlates) == 0:          # if list of possible plates is empty
-        return listOfPossiblePlates             # return
+    if len(listOfPossibleLabels) == 0:          # if list of possible plates is empty
+        return listOfPossibleLabels             # return
     # end if
 
             # at this point we can be sure the list of possible plates has at least one plate
 
-    for possiblePlate in listOfPossiblePlates:          # for each possible plate, this is a big for loop that takes up most of the function
+    for PossibleLabel in listOfPossibleLabels:          # for each possible plate, this is a big for loop that takes up most of the function
 
-        possiblePlate.imgGrayscale, possiblePlate.imgThresh = Preprocess.preprocess(possiblePlate.imgPlate)     # preprocess to get grayscale and threshold images
+        PossibleLabel.imgGrayscale, PossibleLabel.imgThresh = Preprocess.preprocess(PossibleLabel.imgPlate)     # preprocess to get grayscale and threshold images
 
         if Main.showSteps == True: # show steps ###################################################
-            cv2.imshow("5a", possiblePlate.imgPlate)
-            cv2.imshow("5b", possiblePlate.imgGrayscale)
-            cv2.imshow("5c", possiblePlate.imgThresh)
+            cv2.imshow("5a", PossibleLabel.imgPlate)
+            cv2.imshow("5b", PossibleLabel.imgGrayscale)
+            cv2.imshow("5c", PossibleLabel.imgThresh)
         # end if # show steps #####################################################################
 
-                # increase size of plate image for easier viewing and char detection
-        possiblePlate.imgThresh = cv2.resize(possiblePlate.imgThresh, (0, 0), fx = 1.6, fy = 1.6)
+        # increase size of plate image for easier viewing and char detection
+        PossibleLabel.imgThresh = cv2.resize(PossibleLabel.imgThresh, (0, 0), fx = 1.6, fy = 1.6)
 
-                # threshold again to eliminate any gray areas
-        thresholdValue, possiblePlate.imgThresh = cv2.threshold(possiblePlate.imgThresh, 0.0, 255.0, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
+        # threshold again to eliminate any gray areas
+        thresholdValue, PossibleLabel.imgThresh = cv2.threshold(PossibleLabel.imgThresh, 0.0, 255.0, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
 
         if Main.showSteps == True: # show steps ###################################################
-            cv2.imshow("5d", possiblePlate.imgThresh)
+            cv2.imshow("5d", PossibleLabel.imgThresh)
         # end if # show steps #####################################################################
 
-                # find all possible chars in the plate,
-                # this function first finds all contours, then only includes contours that could be chars (without comparison to other chars yet)
-        listOfPossibleCharsInPlate = findPossibleCharsInPlate(possiblePlate.imgGrayscale, possiblePlate.imgThresh)
+        # find all possible chars in the plate,
+        # this function first finds all contours, then only includes contours that could be chars (without comparison to other chars yet)
+        listOfPossibleCharsInPlate = findPossibleCharsInPlate(PossibleLabel.imgGrayscale, PossibleLabel.imgThresh)
 
         if Main.showSteps == True: # show steps ###################################################
-            height, width, numChannels = possiblePlate.imgPlate.shape
+            height, width, numChannels = PossibleLabel.imgPlate.shape
             imgContours = np.zeros((height, width, 3), np.uint8)
             del contours[:]                                         # clear the contours list
 
@@ -157,7 +157,7 @@ def detectCharsInPlates(listOfPossiblePlates):
                 cv2.waitKey(0)
             # end if # show steps #################################################################
 
-            possiblePlate.strChars = ""
+            PossibleLabel.strChars = ""
             continue						# go back to top of for loop
         # end if
 
@@ -213,11 +213,11 @@ def detectCharsInPlates(listOfPossiblePlates):
             cv2.imshow("9", imgContours)
         # end if # show steps #####################################################################
 
-        possiblePlate.strChars = recognizeCharsInPlate(possiblePlate.imgThresh, longestListOfMatchingCharsInPlate)
+        PossibleLabel.strChars = recognizeCharsInPlate(PossibleLabel.imgThresh, longestListOfMatchingCharsInPlate)
 
         if Main.showSteps == True: # show steps ###################################################
             print("chars found in plate number " + str(
-                intPlateCounter) + " = " + possiblePlate.strChars + ", click on any image and press a key to continue . . .")
+                intPlateCounter) + " = " + PossibleLabel.strChars + ", click on any image and press a key to continue . . .")
             intPlateCounter = intPlateCounter + 1
             cv2.waitKey(0)
         # end if # show steps #####################################################################
@@ -229,7 +229,7 @@ def detectCharsInPlates(listOfPossiblePlates):
         cv2.waitKey(0)
     # end if
 
-    return listOfPossiblePlates
+    return listOfPossibleLabels
 # end function
 
 ###################################################################################################
@@ -239,7 +239,7 @@ def findPossibleCharsInPlate(imgGrayscale, imgThresh):
     imgThreshCopy = imgThresh.copy()
 
             # find all contours in plate
-    imgContours, contours, npaHierarchy = cv2.findContours(imgThreshCopy, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
+    contours, npaHierarchy = cv2.findContours(imgThreshCopy, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
 
     for contour in contours:                        # for each contour
         possibleChar = PossibleChar.PossibleChar(contour)
@@ -267,9 +267,9 @@ def checkIfPossibleChar(possibleChar):
 
 ###################################################################################################
 def findListOfListsOfMatchingChars(listOfPossibleChars):
-            # with this function, we start off with all the possible chars in one big list
-            # the purpose of this function is to re-arrange the one big list of chars into a list of lists of matching chars,
-            # note that chars that are not found to be in a group of matches do not need to be considered further
+    # with this function, we start off with all the possible chars in one big list
+    # the purpose of this function is to re-arrange the one big list of chars into a list of lists of matching chars,
+    # note that chars that are not found to be in a group of matches do not need to be considered further
     listOfListsOfMatchingChars = []                  # this will be the return value
 
     for possibleChar in listOfPossibleChars:                        # for each possible char in the one big list of chars
