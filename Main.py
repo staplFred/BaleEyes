@@ -15,7 +15,7 @@ SCALAR_RED = (0.0, 0.0, 255.0)
 
 showSteps = False
 showContours = True
-showStep1 = True
+showStep1 = False
 
 def main():
 
@@ -25,7 +25,6 @@ def main():
         print("\nerror: KNN traning was not successful\n")  # show error message
         return                                                          # and exit program
     # end if
-
 
     imgOriginal = cv2.imread("./images/bales/bales.jpg")               # open image
 

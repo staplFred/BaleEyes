@@ -34,7 +34,6 @@ def detectLabels(img):
         imgContours = np.zeros((h, w, 3), np.uint8)
 
         contours = []
-
         for possibleChar in listOfPossibleCharsInScene:
             contours.append(possibleChar.contour)
         # end for
@@ -98,13 +97,12 @@ def findPossibleCharsInScene(imgThresh, imgContours):
     height, width = imgThresh.shape
     imgContours = np.zeros((height, width, 3), np.uint8)
 
+    if Main.showContours == True: # show steps ###################################################
+        cv2.drawContours(imgContours, contours, -1, Main.SCALAR_RED)
+        cv2.drawContours(imgThresh, contours, -1, Main.SCALAR_RED)
+    # # end if # show steps #####################################################################
+
     for i in range(0, len(contours)):                       # for each contour
-
-        if Main.showContours == True: # show steps ###################################################
-            cv2.drawContours(imgContours, contours, i, Main.SCALAR_RED)
-            cv2.drawContours(imgThresh, contours, i, Main.SCALAR_RED)
-        # # end if # show steps #####################################################################
-
         possibleChar = PossibleChar.PossibleChar(contours[i])
 
         if DetectChars.checkIfPossibleChar(possibleChar):                   # if contour is a possible char, note this does not compare to other chars (yet) . . .
@@ -114,14 +112,15 @@ def findPossibleCharsInScene(imgThresh, imgContours):
             y1 = possibleChar.intBoundingRectY
             x2 = possibleChar.intBoundingRectX + possibleChar.intBoundingRectWidth
             y2 = possibleChar.intBoundingRectY + possibleChar.intBoundingRectHeight
-            # cv2.rectangle(imgContours, (x1,y1), (x2,y2), Main.SCALAR_GREEN)
+            cv2.rectangle(imgContours, (x1,y1), (x2,y2), Main.SCALAR_GREEN)
         # end if
     # end for
 
     if Main.showContours == True: # show steps #######################################################
         print("\nstep 2 - len(contours) = " + str(len(contours)))  # 2362 with MCLRNF1 image
         print("step 2 - intCountOfPossibleChars = " + str(intCountOfPossibleChars))  # 131 with MCLRNF1 image
-        cv2.imshow("Contours", imgContours)
+        cv2.imshow("imgContours", imgContours)
+        cv2.imshow("Thresh", imgThresh)
     # end if # show steps #########################################################################
 
     return listOfPossibleChars
