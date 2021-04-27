@@ -22,27 +22,21 @@ fontThickness = 2
 def nothing(x):
     pass
 
-def processImage(imagePath):
+def processImage(frame):
     frame_HSV = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     thresh = cv2.inRange(frame_HSV, (lh, ls, lv), (hh, hs, hv))
     contours, hierarchy = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     tags = findTags(contours)
-    print('Tags found for ', imagePath, ': ', len(tags))
+    print('Tags found: ',  len(tags))
     for i, tag in enumerate(tags):
         roi = tag.ROI = frame[tag.intY : tag.intY + tag.intHeight,
                            tag.intX : tag.intX + tag.intWidth]
-        cv2.resize(roi, None, fx=3, fy=3, interpolation=cv2.INTER_AREA)
-        cv2.imshow('roi', roi)
-
-        # hist = cv2.calcHist(roi, [3], None, [256], [0, 256])
-        # print(hist)
-
+        cv2.imshow('roi', larger(roi))
         cv2.drawContours(frame, tag.contour, -1, (0,0,255), 3)
         cv2.putText(frame, str(i), (tag.intX, tag.intY), font, fontScale, fontColor, fontThickness )      
         cv2.waitKey(0)
 
-    smallerFrame = cv2.resize(frame, None, fx=.25, fy=.25, interpolation=cv2.INTER_AREA )
-    return smallerFrame
+    return frame
 
 def findBales(imagePath):
     frame = cv2.imread(imagePath)
@@ -92,12 +86,15 @@ def smaller(image):
     smallerImage = cv2.resize(image, None, fx=.25, fy=.25, interpolation=cv2.INTER_AREA )
     return smallerImage
 
+def larger(image):
+    return cv2.resize(image, None, fx=3, fy=3, interpolation=cv2.INTER_AREA)
+
 cv2.namedWindow('Original')
 cv2.moveWindow('Original', 0, 0)
 # cv2.namedWindow('Thresh')
 # cv2.moveWindow('Thresh', 700, 0)
-cv2.namedWindow('eq')
-cv2.moveWindow('eq', 700, 0)
+# cv2.namedWindow('eq')
+# cv2.moveWindow('eq', 700, 0)
 
 
 # path = './images/bales/bb*.*'
@@ -109,10 +106,7 @@ for idx, image in enumerate(images):
     if frame is None:
         print('File Not found: ', imagePath)
         quit()
-    # frame = processImage(image)
-
-    # show_rgb_equalized(frame)
-    show_hsv_equalized(frame)
+    frame = processImage(frame)
     cv2.imshow('Original', smaller(frame))   
     cv2.waitKey(0)
     cv2.destroyAllWindows()

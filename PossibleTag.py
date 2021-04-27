@@ -25,11 +25,14 @@ class PossibleTag:
         self.fltDiagonalSize = math.sqrt((self.intWidth ** 2) + (self.intHeight ** 2))
         self.fltAspectRatio = float(self.intWidth) / float(self.intHeight)
         self.aspectRatio = self.intWidth / self.intHeight
+        self.numSides = len(cv2.approxPolyDP(_contour, 0.01*cv2.arcLength(_contour, True),True))
 
     def meetsCriteria(self):
         if self.area < MIN_CONTOUR_AREA or self.area > MAX_CONTOUR_AREA:
             return False
         if self.aspectRatio < MIN_ASPECT_RATIO or self.aspectRatio > MAX_ASPECT_RATIO:
+            return False
+        if self.numSides != 4:
             return False
         return True
 
