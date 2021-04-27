@@ -24,13 +24,18 @@ class PossibleTag:
         self.intCenterY = (self.intY + self.intY + self.intHeight) / 2
         self.fltDiagonalSize = math.sqrt((self.intWidth ** 2) + (self.intHeight ** 2))
         self.fltAspectRatio = float(self.intWidth) / float(self.intHeight)
+        self.aspectRatio = self.intWidth / self.intHeight
 
     def meetsCriteria(self):
         if self.area < MIN_CONTOUR_AREA or self.area > MAX_CONTOUR_AREA:
             return False
-        if self.fltAspectRatio < MIN_ASPECT_RATIO or self.fltAspectRatio > MAX_ASPECT_RATIO:
+        if self.aspectRatio < MIN_ASPECT_RATIO or self.aspectRatio > MAX_ASPECT_RATIO:
             return False
         return True
+
+    def setROI(self, image):
+        self.ROI = image[self.intY : self.intY + self.intHeight,
+                           self.intX : self.intX + self.intWidth]
 
 # end class
 
